@@ -19,7 +19,7 @@ def parse_requirements(fname_list=[]):
 setup(
     # 描述信息
     name="wadda",
-    version="0.0.1",
+    version="0.0.2",
     description="Wind's Autonomous Driving Development Art",
     author="windzu",
     author_email="windzu1@gmail.com",
