@@ -39,7 +39,7 @@ wadda pcd . # view pcd file or pcd folder
 ### data collection
 
 ```bash
-wadda dc . # By filtering the default ros message type, and then store the data
+wadda dc # By filtering the default ros message type, and then logging the data
 ```
 
 ### gif generator
