@@ -2,10 +2,13 @@ from argparse import ArgumentParser
 
 
 def parse_args():
-    parser = ArgumentParser()
-    parser.add_argument("function", help="function name want to use")
-    parser.add_argument("path", help="file path or dir path", default=None)
-    parser.add_argument("--topic", help="ros camera topic")
+    parser = ArgumentParser(
+        description="wadda is a collection of toolkits and libraries related to autonomous driving."
+    )
+    parser.add_argument("function", type=str, help="function name want to use")
+    parser.add_argument("path", nargs="?", type=str, help="file path or dir path")
+    parser.add_argument("--pro", action="store_true", help="whether to enable professional mode")
+    parser.add_argument("-V", "--version", action="version", version="%(prog)s 0.0.1")
     args = parser.parse_args()
     return args
 
