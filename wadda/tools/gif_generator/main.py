@@ -1,7 +1,5 @@
 import os
 import imageio.v2 as imageio
-from tqdm import tqdm
-import numpy as np
 import cv2
 from argparse import ArgumentParser
 from rich.progress import track

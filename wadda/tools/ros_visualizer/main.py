@@ -1,4 +1,5 @@
 import random
+from argparse import ArgumentParser
 
 # ros
 import rospy
@@ -210,6 +211,13 @@ class ROSVisualizer(object):
         else:
             color = ColorRGBA(random.random(), random.random(), random.random(), 0.8)
         return color
+
+
+def parse_args():
+    parser = ArgumentParser()
+    parser.add_argument("--path", type=str, help="data root path")
+    parser.add_argument("--pro", action="store_true", help="whether to enable professional mode")
+    return parser.parse_args()
 
 
 def main(args=None):
