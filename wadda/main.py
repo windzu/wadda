@@ -32,6 +32,10 @@ def main():
         from wadda.tools import ros_visualizer
 
         ros_visualizer.main(args)
+    elif args.function == "v2c" or args.function == "voc2coco":
+        from wadda.tools import voc2coco
+
+        voc2coco.main(args)
 
     else:
         print("function name error")

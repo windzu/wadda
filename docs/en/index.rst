@@ -16,38 +16,10 @@ You can switch between Chinese and English documents in the lower-left corner of
 
 .. toctree::
    :maxdepth: 2
-   :caption: Data Collection
+   :caption: Tools
 
-   data_collection/basic.md
-   data_collection/advanced.md
-
-.. toctree::
-   :maxdepth: 2
-   :caption: GIF Generator
-
-   gif_generator/basic.md
-   gif_generator/advanced.md
-
-.. toctree::
-   :maxdepth: 2
-   :caption: PCD Visualizer
-
-   pcd_visualizer/basic.md
-   pcd_visualizer/advanced.md
-
-.. toctree::
-   :maxdepth: 2
-   :caption: ROS Visualizer
-
-   ros_visualizer/basic.md
-   ros_visualizer/advanced.md
-
-.. toctree::
-   :maxdepth: 2
-   :caption: VOC2COCO
-
-   voc2coco/basic.md
-   voc2coco/advanced.md
+   tools/data_collection.md
+   tools/ros_visualizer.md
 
 .. toctree::
    :maxdepth: 2
