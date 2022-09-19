@@ -1,5 +1,5 @@
 name: Publish to test PyPI
-on: [merge,pull_request]:
+on: [push,pull_request]:
   branches:
     - main
 
