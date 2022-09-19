@@ -1,0 +1,29 @@
+name: Publish to test PyPI
+on: [merge,pull_request]:
+  branches:
+    - main
+
+jobs:
+  build:
+    name: Build and publish to test PyPI # Name of the job
+    runs-on: ubuntu-latest # set the OS
+    steps:
+      - uses: actions/checkout@v3 # Action to checkout the code
+
+      - name: Set up Python 3.8 # Name of the step
+        uses: actions/setup-python@v3 # Action to setup Python
+        with:
+          python-version: 3.8 # Python version to use
+
+      - name: Install dependencies
+        run: | # install the dependencies
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+
+      - name: Build and publish
+        env: # set the environment variables
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
+        run: | # build and publish the package
+          python setup.py sdist bdist_wheel
+          twine upload --repository testpypi dist/*
