@@ -16,7 +16,9 @@ This repository provides some handy tools and useful libraries
 | ----- |:---------------------------------------:|
 | pypcd | libraries for working with point clouds |
 |       |                                         |
+
 ## Install
+
 ```bash
 pip3 install wadda
 ```
@@ -31,18 +33,29 @@ wadda [function_name] [path]
 
 ### pcd visualizer
 
-```bash
+* path : pcd file or the folder containing the pcd file
 
+* tricks：If viewing a folder containing pcd files, use the "space" and "z" keys to control viewing the next and previous frames, and the "q" key to exit
+
+```bash
 wadda pcd . # view pcd file or pcd folder
 ```
 
 ### data collection
 
+* path：Specify the path where you want the data to be stored
+
+* pro：For advanced usage, please refer to the doc
+
 ```bash
-wadda dc # By filtering the default ros message type, and then logging the data
+wadda dc . # By filtering the default ros message type, and then store the data
 ```
 
 ### gif generator
+
+> All folders under this path will be traversed. If a folder contains images or point cloud files, a gif will be generated with the name of the folder and stored in its parent directory
+
+* path：Want to traverse the root path of the generated gif
 
 ```bash
 wadda gif . # generator gif from specify path
@@ -50,11 +63,33 @@ wadda gif . # generator gif from specify path
 
 ### voc2coco
 
+* path：The path where the standard voc format data set is located
+  
+  ```bash
+  path
+  ├── Annotations
+  ├── coco
+  ├── ImageSets
+  ├── JPEGImages
+  └── labels.txt
+  ```
+
+* labels.txt ：The labels.txt file must be included, and its content is the name of the category, which is used to map from class name to label id when converting to coco
+  
+  ```txt
+  class_name_0
+  class_name_1
+  class_name_2
+  ...
+  ```
+
 ```bash
 wadda v2c . # convert voc to coco
 ```
 
 ### ros visualizer
+
+* pro：For advanced usage, please refer to the doc
 
 ```bash
 wadda ros # start ros visualizer for converting ros msg
