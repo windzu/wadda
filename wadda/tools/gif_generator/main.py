@@ -94,6 +94,7 @@ class GIFGenerator:
         img_list = []
         for img_path in img_path_list:
             img = cv2.imread(img_path)
+            img=img[...,::-1] # BGR2RGB
             img = cv2.resize(img, self.resize_size)
             img_list.append(img)
         imageio.mimsave(save_path, img_list, fps=10)

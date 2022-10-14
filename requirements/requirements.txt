@@ -1,6 +1,9 @@
 # data_collection
 
 # gif_generator
+imageio==2.21.1
+opencv-python
+rich
 
 # pcd_visualizer
 open3d
