@@ -41,7 +41,6 @@ setup(
     packages=find_packages(exclude=("docs")),
     install_requires=parse_requirements([
         "requirements/requirements.txt",
-        "requirements/pypcd.txt",
     ]),
     entry_points={"console_scripts": ["wadda=wadda.main:main"]},
     # 次要设置

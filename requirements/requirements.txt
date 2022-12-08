@@ -10,3 +10,8 @@ open3d
 
 # ros_visualizer
 rospkg
+
+# pypcd
+numpy
+python-lzf
+
