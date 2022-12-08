@@ -19,7 +19,7 @@ def parse_requirements(fname_list=[]):
 setup(
     # 描述信息
     name="wadda",
-    version="0.0.4",
+    version="0.0.5",
     description="Wind's Autonomous Driving Development Art",
     author="windzu",
     author_email="windzu1@gmail.com",
@@ -39,12 +39,10 @@ setup(
     # 主要设置
     python_requires=">=3.6",
     packages=find_packages(exclude=("docs")),
-    install_requires=parse_requirements(
-        [
-            "requirements/requirements.txt",
-            "requirements/pypcd.txt",
-        ]
-    ),
+    install_requires=parse_requirements([
+        "requirements/requirements.txt",
+        "requirements/pypcd.txt",
+    ]),
     entry_points={"console_scripts": ["wadda=wadda.main:main"]},
     # 次要设置
     include_package_data=True,

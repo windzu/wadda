@@ -20,6 +20,7 @@ This repository provides some handy tools and useful libraries
 ## Install
 
 ```bash
+sudo apt install ros-xxx-foxglove-msgs # xxx can be noetic, melodic, etc.
 pip3 install wadda
 ```
 
