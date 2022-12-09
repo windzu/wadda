@@ -5,6 +5,7 @@ import open3d
 
 
 class PCDVisualizer:
+
     def __init__(self, file_path, width=1024, height=768):
         self.file_path = file_path
         self.width = width
@@ -12,7 +13,8 @@ class PCDVisualizer:
 
         self.index = 0  # record the index of file_list
         self.file_list = []
-        self.axis_pcd = open3d.geometry.TriangleMesh().create_coordinate_frame()
+        self.axis_pcd = open3d.geometry.TriangleMesh().create_coordinate_frame(
+        )
 
         self.supported_file_type = ["pcd", "bin"]
 
@@ -25,9 +27,12 @@ class PCDVisualizer:
             self.__update(self.index)
 
             # 设置键盘响应事件
-            self.visualizer.register_key_callback(90, lambda temp: self.__last())  # z last
-            self.visualizer.register_key_callback(ord(" "), lambda temp: self.__next())  # space next
-            self.visualizer.register_key_callback(ord("q"), lambda temp: self.__close())  # 'q' close
+            self.visualizer.register_key_callback(
+                90, lambda temp: self.__last())  # z last
+            self.visualizer.register_key_callback(
+                ord(" "), lambda temp: self.__next())  # space next
+            self.visualizer.register_key_callback(
+                ord("q"), lambda temp: self.__close())  # 'q' close
             self.visualizer.run()
 
     def __file_init(self):
@@ -37,12 +42,14 @@ class PCDVisualizer:
                 if str(file).split(".")[-1] in self.supported_file_type:
                     self.file_list.append(str(file))
             self.file_list = sorted(self.file_list, key=lambda p: Path(p).stem)
-        elif Path(self.file_path).is_file() and self.file_path.split(".")[-1] in self.supported_file_type:
+        elif Path(self.file_path).is_file() and self.file_path.split(
+                ".")[-1] in self.supported_file_type:
             self.file_list = [self.file_path]
 
     def __visualizer_init(self):
         self.visualizer = open3d.visualization.VisualizerWithKeyCallback()
-        self.visualizer.create_window(window_name="viwer", width=self.width, height=self.height)
+        self.visualizer.create_window(
+            window_name="viwer", width=self.width, height=self.height)
 
         # setting
         visualizer_option = self.visualizer.get_render_option()
@@ -77,8 +84,18 @@ class PCDVisualizer:
             o3d_pcd = open3d.io.read_point_cloud(new_pcd_file)
         elif new_pcd_file.endswith(".bin"):
             bin_pcd = np.fromfile(new_pcd_file, dtype=np.float32)
-            points = bin_pcd.reshape((-1, 4))[:, 0:3]
-            o3d_pcd = open3d.geometry.PointCloud(open3d.utility.Vector3dVector(points))
+
+            # can not sure the shape of bin_pcd is (n, 4) or (n, 5)
+            # first think it is (n, 5)
+            if bin_pcd.shape[0] % 5 == 0:
+                points = bin_pcd.reshape((-1, 5))[:, 0:3]
+            elif bin_pcd.shape[0] % 4 == 0:
+                points = bin_pcd.reshape((-1, 4))[:, 0:3]
+            else:
+                print("bin_pcd shape error")
+                return
+            o3d_pcd = open3d.geometry.PointCloud(
+                open3d.utility.Vector3dVector(points))
         else:
             print("suffix error")
             return
@@ -90,7 +107,7 @@ class PCDVisualizer:
 
 def parse_args():
     parser = argparse.ArgumentParser(description="view point cloud")
-    parser.add_argument("-path", help="file path or dir path")
+    parser.add_argument("--path", help="file path or dir path")
     parser.add_argument("--width", help="window width", default=1024)
     parser.add_argument("--height", help="window height", default=768)
     return parser.parse_args()

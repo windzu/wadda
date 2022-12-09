@@ -3,12 +3,17 @@ from argparse import ArgumentParser
 
 def parse_args():
     parser = ArgumentParser(
-        description="wadda is a collection of toolkits and libraries related to autonomous driving."
-    )
+        description="wadda is a collection of toolkits and libraries \
+            related to autonomous driving.")
     parser.add_argument("function", type=str, help="function name want to use")
-    parser.add_argument("path", nargs="?", type=str, help="file path or dir path")
-    parser.add_argument("--pro", action="store_true", help="whether to enable professional mode")
-    parser.add_argument("--version", action="version", version="%(prog)s 0.0.1")
+    parser.add_argument(
+        "path", nargs="?", type=str, help="file path or dir path")
+    parser.add_argument(
+        "--pro",
+        action="store_true",
+        help="whether to enable professional mode")
+    parser.add_argument(
+        "--version", action="version", version="%(prog)s 0.0.5")
     args = parser.parse_args()
     return args
 
