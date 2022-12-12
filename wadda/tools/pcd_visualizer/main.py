@@ -16,7 +16,7 @@ class PCDVisualizer:
         self.axis_pcd = open3d.geometry.TriangleMesh().create_coordinate_frame(
         )
 
-        self.supported_file_type = ["pcd", "bin"]
+        self.supported_file_type = ["pcd", "bin", "npz"]
 
         self.__visualizer_init()
         self.__file_init()
@@ -94,6 +94,11 @@ class PCDVisualizer:
             else:
                 print("bin_pcd shape error")
                 return
+            o3d_pcd = open3d.geometry.PointCloud(
+                open3d.utility.Vector3dVector(points))
+        elif new_pcd_file.endswith(".npz"):
+            npz_pcd = np.load(new_pcd_file)
+            points = npz_pcd["points"]
             o3d_pcd = open3d.geometry.PointCloud(
                 open3d.utility.Vector3dVector(points))
         else:
