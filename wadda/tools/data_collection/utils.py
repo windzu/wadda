@@ -7,7 +7,7 @@ from scipy.spatial.transform import Rotation as R
 
 # ros
 import rospy
-from pypcd import pypcd
+from wadda.pypcd import pypcd
 from sensor_msgs.msg import CompressedImage, PointCloud2
 
 
@@ -52,7 +52,8 @@ def merge_pcd(datas, calib):
         y = pc.pc_data["y"].flatten()
         z = pc.pc_data["z"].flatten()
         intensity = pc.pc_data["intensity"].flatten()
-        nan_index = np.isnan(x) | np.isnan(y) | np.isnan(z) | np.isnan(intensity)  # filter nan data
+        nan_index = np.isnan(x) | np.isnan(y) | np.isnan(z) | np.isnan(
+            intensity)  # filter nan data
         pc_array_4d = np.zeros((x[~nan_index].shape[0], 4), dtype=np.float32)
         pc_array_4d[:, 0] = x[~nan_index]
         pc_array_4d[:, 1] = y[~nan_index]
@@ -66,7 +67,8 @@ def merge_pcd(datas, calib):
     merge_pcd = None
     for key, value in calib.items():
         assert key in datas, f"calib key {key} not in datas"
-        assert isinstance(datas[key], PointCloud2), f"calib key {key} not PointCloud2"
+        assert isinstance(datas[key],
+                          PointCloud2), f"calib key {key} not PointCloud2"
         pcd = transform_pcd(datas[key], calib[key])
         del datas[key]
         if merge_pcd is None:
@@ -89,7 +91,8 @@ def save_datas(path, scene_name, datas, filename):
     """
 
     def save_img(path, data, filename):
-        buf = np.ndarray(shape=(1, len(data.data)), dtype=np.uint8, buffer=data.data)
+        buf = np.ndarray(
+            shape=(1, len(data.data)), dtype=np.uint8, buffer=data.data)
         frame = cv2.imdecode(buf, cv2.IMREAD_ANYCOLOR)
         save_path = os.path.join(path, filename + ".jpg")
         ret = cv2.imwrite(save_path, frame)
@@ -123,17 +126,20 @@ def save_datas(path, scene_name, datas, filename):
         if suffix == ".pcd":
             pcd = o3d.geometry.PointCloud()
             pcd.points = o3d.utility.Vector3dVector(
-                np.vstack((pc_array_4d[:, 0], pc_array_4d[:, 1], pc_array_4d[:, 2])).T
-            )
+                np.vstack(
+                    (pc_array_4d[:, 0], pc_array_4d[:, 1], pc_array_4d[:,
+                                                                       2])).T)
             pcd.colors = o3d.utility.Vector3dVector(
-                np.vstack((pc_array_4d[:, 3], pc_array_4d[:, 3], pc_array_4d[:, 3])).T
-            )
+                np.vstack(
+                    (pc_array_4d[:, 3], pc_array_4d[:, 3], pc_array_4d[:,
+                                                                       3])).T)
             o3d.io.write_point_cloud(save_path, pcd)
         elif suffix == ".npy":
             path = path.remove(".npy")
             np.save(save_path, pc_array_4d)
         elif suffix == ".bin":
-            nan_index = np.isnan(x) | np.isnan(y) | np.isnan(z) | np.isnan(intensity)  # filter nan data
+            nan_index = np.isnan(x) | np.isnan(y) | np.isnan(z) | np.isnan(
+                intensity)  # filter nan data
             pc_array_4d = pc_array_4d[~nan_index]
             pc_array_4d.tofile(save_path)
         else:

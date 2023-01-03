@@ -85,11 +85,14 @@ class PCDVisualizer:
         elif new_pcd_file.endswith(".bin"):
             bin_pcd = np.fromfile(new_pcd_file, dtype=np.float32)
 
-            # can not sure the shape of bin_pcd is (n, 4) or (n, 5)
-            # first think it is (n, 5)
-            if bin_pcd.shape[0] % 5 == 0:
-                points = bin_pcd.reshape((-1, 5))[:, 0:3]
-            elif bin_pcd.shape[0] % 4 == 0:
+            # # can not sure the shape of bin_pcd is (n, 4) or (n, 5)
+            # # first think it is (n, 5)
+            # if bin_pcd.shape[0] % 5 == 0:
+            #     points = bin_pcd.reshape((-1, 5))[:, 0:3]
+            # elif bin_pcd.shape[0] % 4 == 0:
+            #     points = bin_pcd.reshape((-1, 4))[:, 0:3]
+
+            if bin_pcd.shape[0] % 4 == 0:
                 points = bin_pcd.reshape((-1, 4))[:, 0:3]
             else:
                 print("bin_pcd shape error")

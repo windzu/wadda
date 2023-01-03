@@ -29,6 +29,10 @@ def main():
         from wadda.tools import pcd_visualizer
 
         pcd_visualizer.main(args)
+    elif args.function == "vis_kitti" or args.function == "kitti_visualizer":
+        from wadda.tools import kitti_visualizer
+
+        kitti_visualizer.main(args)
     elif args.function == "gif" or args.function == "gif_generator":
         from wadda.tools import gif_generator
 
