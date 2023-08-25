@@ -1,3 +1,11 @@
+'''
+Author: wind windzu1@gmail.com
+Date: 2023-08-25 13:46:25
+LastEditors: wind windzu1@gmail.com
+LastEditTime: 2023-08-25 18:29:45
+Description: 
+Copyright (c) 2023 by windzu, All Rights Reserved. 
+'''
 from argparse import ArgumentParser
 
 
@@ -7,7 +15,6 @@ def parse_args():
     )
     parser.add_argument("function", type=str, help="function name want to use")
     parser.add_argument("path", nargs="?", type=str, help="file path or dir path")
-    parser.add_argument("--pro", action="store_true", help="whether to enable professional mode")
     parser.add_argument("--version", action="version", version="%(prog)s 0.0.1")
     args = parser.parse_args()
     return args
@@ -20,23 +27,17 @@ def main():
 
         data_collection.main(args)
 
-    elif args.function == "pcd" or args.function == "pcd_visualizer":
-        from wadda.tools import pcd_visualizer
+    if args.function == "ds" or args.function == "data_slice" or args.function == "data-slice":
+        from wadda import data_slice
+        data_slice.main(args)
 
-        pcd_visualizer.main(args)
     elif args.function == "gif" or args.function == "gif_generator":
-        from wadda.tools import gif_generator
+        from wadda import gif_generator
 
         gif_generator.main(args)
-    elif args.function == "ros" or args.function == "ros_visualizer":
-        from wadda.tools import ros_visualizer
-
-        ros_visualizer.main(args)
     elif args.function == "v2c" or args.function == "voc2coco":
-        from wadda.tools import voc2coco
-
+        from wadda import voc2coco
         voc2coco.main(args)
-
     else:
         print("function name error")
     return 0

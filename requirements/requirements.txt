@@ -1,12 +1,11 @@
-# data_collection
+# data slice
+numpy
+pyyaml
+rospkg
+wind-pypcd
+opencv-python
 
 # gif_generator
 imageio==2.21.1
-opencv-python
 rich
 
-# pcd_visualizer
-open3d
-
-# ros_visualizer
-rospkg

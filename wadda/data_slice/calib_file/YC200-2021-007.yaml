@@ -1,0 +1,40 @@
+/lidar_points/top:
+  date: "2023-04-25 15:24:01"
+  sensor_type: lidar
+  tf_config:
+    tf_x: 0.25
+    tf_y: 0
+    tf_z: 1.3
+    tf_roll: 0
+    tf_pitch: 0
+    tf_yaw: -0.02
+/lidar_points/front:
+  date: "2023-04-25 15:24:01"
+  sensor_type: lidar
+  tf_config:
+    tf_x: 0.35
+    tf_y: -0.02
+    tf_z: 1.392953753471375
+    tf_roll: 3.116044
+    tf_pitch: 3.094793
+    tf_yaw: 3.065
+/lidar_points/left:
+  date: "2023-04-25 15:24:01"
+  sensor_type: lidar
+  tf_config:
+    tf_x: 0.25
+    tf_y: 0.02
+    tf_z: 1.357587
+    tf_roll: -0.01849759
+    tf_pitch: -0.0004992507
+    tf_yaw: -0.09
+/lidar_points/right:
+  date: "2023-04-25 15:24:01"
+  sensor_type: lidar
+  tf_config:
+    tf_x: 0.19
+    tf_y: -0.07
+    tf_z: 1.38253
+    tf_roll: -3.116857
+    tf_pitch: -3.130175
+    tf_yaw: 3.02

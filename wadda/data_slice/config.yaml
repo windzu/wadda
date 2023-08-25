@@ -1,0 +1,57 @@
+# 设置待切片数据的根路径
+dataset_root: /home/wind/Backup/data_slice/bug
+
+# 设置希望排除的路径
+exclude_path:
+  - /home/wind/Backup/ROSBag/Bug/200A-007/2023-05-26
+  - /home/wind/Backup/ROSBag/Bug/200A-007/2023-06-06
+
+# 设置切片后数据的保存路径
+save_root: /home/wind/Backup/data_slice
+
+# 设置数据包后缀
+suffix: .bag
+
+# 设置希望采集的topic
+topics:
+  imu:
+  camera:
+  lidar:
+    - /lidar_points/top
+    - /lidar_points/left
+    - /lidar_points/front
+    - /lidar_points/right
+  gps:
+
+# 设置topic对应的消息类型
+msg_type:
+  imu: sensor_msgs/Imu
+  camera: sensor_msgs/Image
+  lidar: sensor_msgs/PointCloud2
+  gps: sensor_msgs/NavSatFix
+
+# 设置 topics 的别名
+topics_alias:
+  /lidar_points/top: top_lidar
+  /lidar_points/left: left_lidar
+  /lidar_points/front: front_lidar
+  /lidar_points/right: right_lidar
+
+# 设置时间同步基准topic
+main_topic: /lidar_points/top
+
+# 设置时间同步相较于基准topic的最大时间差(ms)
+time_diff_threshold: 10
+
+# 设置一个场景采样10帧，每隔0.5s采集一帧，即一个场景采样5s
+constants:
+  total_frames: 10
+  scene_interval: 0.5
+
+
+
+
+# 希望将四个lidar的点云数据通过外參进行拼接，最终只保存一个文件，其文件家夹名称将默认为
+calib:
+  load_way: offline # online or offline
+  calib_path: /home/wind/Projects/github/wadda/wadda/data_slice/calib_file
