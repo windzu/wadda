@@ -1,43 +1,82 @@
-'''
+"""
 Author: wind windzu1@gmail.com
-Date: 2023-08-25 13:59:36
+Date: 2023-08-27 18:34:41
 LastEditors: wind windzu1@gmail.com
-LastEditTime: 2023-08-25 17:50:53
+LastEditTime: 2023-08-28 00:23:10
 Description: 
 Copyright (c) 2023 by windzu, All Rights Reserved. 
-'''
+"""
 import os
 
 import cv2
 import numpy as np
+
 # import open3d as o3d
 import rosbag
+
 # ros
 import rospy
 import yaml
 from pypcd import pypcd
+
 # from scipy.spatial.transform import Rotation as R
 from sensor_msgs.msg import CompressedImage, PointCloud2
 
 
-def save_camera(msg, topic_info,path, filename):
-    file_path=os.path.join(path, filename + ".png")
+def save_camera(msg, topic_info, path, filename):
+    file_path = os.path.join(path, filename + ".png")
 
     if not os.path.exists(os.path.dirname(file_path)):
         os.makedirs(os.path.dirname(file_path))
-    
-def save_lidar(msg, topic_info,path, filename):
-    file_path=os.path.join(path, filename + ".pcd")
+
+
+def save_lidar(msg, topic_info, path, filename):
+    file_path = os.path.join(path, filename + ".pcd")
 
     if not os.path.exists(os.path.dirname(file_path)):
         os.makedirs(os.path.dirname(file_path))
 
     # save PointCloud2 to bin
     pc = pypcd.PointCloud.from_msg(msg)
-    pc.save_pcd(file_path, compression='binary_compressed')
+    pc.save_pcd(file_path, compression="binary_compressed")
+
 
 def save_imu(msg, path, filename):
     pass
+
+
+def euler_to_rotation_matrix(roll, pitch, yaw):
+    """
+    Convert Euler angles (roll, pitch, yaw) to a rotation matrix.
+    All angles are in degrees.
+    """
+    roll = np.radians(roll)
+    pitch = np.radians(pitch)
+    yaw = np.radians(yaw)
+
+    rotation_x = np.array(
+        [
+            [1, 0, 0],
+            [0, np.cos(roll), -np.sin(roll)],
+            [0, np.sin(roll), np.cos(roll)],
+        ]
+    )
+
+    rotation_y = np.array(
+        [
+            [np.cos(pitch), 0, np.sin(pitch)],
+            [0, 1, 0],
+            [-np.sin(pitch), 0, np.cos(pitch)],
+        ]
+    )
+
+    rotation_z = np.array(
+        [[np.cos(yaw), -np.sin(yaw), 0], [np.sin(yaw), np.cos(yaw), 0], [0, 0, 1]]
+    )
+
+    rotation = np.dot(rotation_z, np.dot(rotation_y, rotation_x))
+
+    return rotation
 
 
 def timestamp_analyze(datas, main_frame_id):
@@ -81,7 +120,9 @@ def merge_pcd(datas, calib):
         y = pc.pc_data["y"].flatten()
         z = pc.pc_data["z"].flatten()
         intensity = pc.pc_data["intensity"].flatten()
-        nan_index = np.isnan(x) | np.isnan(y) | np.isnan(z) | np.isnan(intensity)  # filter nan data
+        nan_index = (
+            np.isnan(x) | np.isnan(y) | np.isnan(z) | np.isnan(intensity)
+        )  # filter nan data
         pc_array_4d = np.zeros((x[~nan_index].shape[0], 4), dtype=np.float32)
         pc_array_4d[:, 0] = x[~nan_index]
         pc_array_4d[:, 1] = y[~nan_index]
@@ -162,7 +203,9 @@ def save_datas(path, scene_name, datas, filename):
             path = path.remove(".npy")
             np.save(save_path, pc_array_4d)
         elif suffix == ".bin":
-            nan_index = np.isnan(x) | np.isnan(y) | np.isnan(z) | np.isnan(intensity)  # filter nan data
+            nan_index = (
+                np.isnan(x) | np.isnan(y) | np.isnan(z) | np.isnan(intensity)
+            )  # filter nan data
             pc_array_4d = pc_array_4d[~nan_index]
             pc_array_4d.tofile(save_path)
         else:

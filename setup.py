@@ -1,3 +1,11 @@
+'''
+Author: wind windzu1@gmail.com
+Date: 2023-08-27 18:30:27
+LastEditors: wind windzu1@gmail.com
+LastEditTime: 2023-08-27 18:45:21
+Description: 
+Copyright (c) 2023 by windzu, All Rights Reserved. 
+'''
 from setuptools import setup, find_packages
 
 
@@ -41,7 +49,6 @@ setup(
     packages=find_packages(exclude=("docs")),
     install_requires=parse_requirements([
         "requirements/requirements.txt",
-        "requirements/pypcd.txt",
     ]),
     entry_points={"console_scripts": ["wadda=wadda.main:main"]},
     # 次要设置

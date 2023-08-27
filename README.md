@@ -1,3 +1,11 @@
+<!--
+ * @Author: wind windzu1@gmail.com
+ * @Date: 2023-08-27 18:30:27
+ * @LastEditors: wind windzu1@gmail.com
+ * @LastEditTime: 2023-08-27 18:46:58
+ * @Description: 
+ * Copyright (c) 2023 by windzu, All Rights Reserved. 
+-->
 # WADDA
 
 > Wind's Autonomous Driving Development Art
@@ -6,21 +14,16 @@ This repository provides some handy tools and useful libraries
 
 | Tools           | Description                                                          |
 | --------------- |:--------------------------------------------------------------------:|
-| pcd visualizer  | view point cloud files                                               |
 | gif generator   | generate gif from image or point cloud                               |
-| data collection | record data via ros                                                  |
+| data slice | slice data to nuscenes format                                                 |
 | voc2coco        | convert standard voc format dataset to coco format                   |
 | ros visualizer  | convert the common message format of ros to marker for visualization |
 
-| Libs  | Description                             |
-| ----- |:---------------------------------------:|
-| pypcd | libraries for working with point clouds |
-|       |                                         |
+
 
 ## Install
 
 ```bash
-sudo apt install ros-xxx-foxglove-msgs # xxx can be noetic, melodic, etc.
 pip3 install wadda
 ```
 
@@ -32,24 +35,15 @@ The following is a brief introduction to its simple usage. For more advanced usa
 wadda [function_name] [path]
 ```
 
-### pcd visualizer
 
-* path : pcd file or the folder containing the pcd file
 
-* tricks：If viewing a folder containing pcd files, use the "space" and "z" keys to control viewing the next and previous frames, and the "q" key to exit
+### data slice
 
-```bash
-wadda pcd . # view pcd file or pcd folder
-```
+* path：Specify the config file path
 
-### data collection
-
-* path：Specify the path where you want the data to be stored
-
-* pro：For advanced usage, please refer to the doc
 
 ```bash
-wadda dc . # By filtering the default ros message type, and then store the data
+wadda ds ./config.yaml
 ```
 
 ### gif generator
@@ -88,27 +82,10 @@ wadda gif . # generator gif from specify path
 wadda v2c . # convert voc to coco
 ```
 
-### ros visualizer
-
-* pro：For advanced usage, please refer to the doc
+## Development
 
 ```bash
-wadda ros # start ros visualizer for converting ros msg
-```
-
-### pypcd
-
-```python
-from wadda import pypcd
-# parse ros pointcloud2 data
-pc = pypcd.PointCloud.from_msg(data)
-x = pc.pc_data['x']
-y = pc.pc_data['y']
-z = pc.pc_data['z']
-
-# parse pcd format file
-pc = pypcd.PointCloud.from_path('foo.pcd')
-x = pc.pc_data['x']
-y = pc.pc_data['y']
-z = pc.pc_data['z']
+git clone https://github.com/windzu/wadda.git
+cd wadda
+pip install -e .
 ```

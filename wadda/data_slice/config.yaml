@@ -1,5 +1,5 @@
 # 设置待切片数据的根路径
-dataset_root: /home/wind/Backup/data_slice/bug
+dataset_root: /home/wind/data/bug
 
 # 设置希望排除的路径
 exclude_path:
@@ -7,10 +7,11 @@ exclude_path:
   - /home/wind/Backup/ROSBag/Bug/200A-007/2023-06-06
 
 # 设置切片后数据的保存路径
-save_root: /home/wind/Backup/data_slice
+save_root: /home/wind/data/slice_bug
 
 # 设置数据包后缀
-suffix: .bag
+compressed_data_suffix : .tgz
+data_suffix: .bag
 
 # 设置希望采集的topic
 topics:
@@ -42,6 +43,12 @@ main_topic: /lidar_points/top
 
 # 设置时间同步相较于基准topic的最大时间差(ms)
 time_diff_threshold: 10
+
+# 设置采样间隔(frame)
+sample_interval: 5
+
+# 设置是否保存sweep数据
+save_sweep_data: false
 
 # 设置一个场景采样10帧，每隔0.5s采集一帧，即一个场景采样5s
 constants:
