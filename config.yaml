@@ -1,5 +1,7 @@
+worker_num: 6 # 设置进程数
+
 # 设置待切片数据的根路径
-dataset_root: /home/wind/data/bug
+dataset_root: /home/dataset/bug
 
 # 设置希望排除的路径
 exclude_path:
@@ -7,22 +9,30 @@ exclude_path:
   - /home/wind/Backup/ROSBag/Bug/200A-007/2023-06-06
 
 # 设置切片后数据的保存路径
-save_root: /home/wind/data/slice_bug
+save_root: /home/dataset/slice_bug
 
 # 设置数据包后缀
 compressed_data_suffix : .tgz
 data_suffix: .bag
 
 # 设置希望采集的topic
+# topics:
+#   imu:
+#   camera:
+#   lidar:
+#     - /lidar_points/top
+#     - /lidar_points/left
+#     - /lidar_points/front
+#     - /lidar_points/right
+#   gps:
+
 topics:
-  imu:
-  camera:
   lidar:
     - /lidar_points/top
     - /lidar_points/left
     - /lidar_points/front
     - /lidar_points/right
-  gps:
+
 
 # 设置topic对应的消息类型
 msg_type:
@@ -42,7 +52,7 @@ topics_alias:
 main_topic: /lidar_points/top
 
 # 设置时间同步相较于基准topic的最大时间差(ms)
-time_diff_threshold: 10
+time_diff_threshold: 50
 
 # 设置采样间隔(frame)
 sample_interval: 5
@@ -50,15 +60,7 @@ sample_interval: 5
 # 设置是否保存sweep数据
 save_sweep_data: false
 
-# 设置一个场景采样10帧，每隔0.5s采集一帧，即一个场景采样5s
-constants:
-  total_frames: 10
-  scene_interval: 0.5
-
-
-
-
 # 希望将四个lidar的点云数据通过外參进行拼接，最终只保存一个文件，其文件家夹名称将默认为
 calib:
   load_way: offline # online or offline
-  calib_path: /home/wind/Projects/github/wadda/wadda/data_slice/calib_file
+  calib_path: ./calib_file

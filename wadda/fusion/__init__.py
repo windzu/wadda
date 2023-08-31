@@ -6,8 +6,7 @@ LastEditTime: 2023-08-28 00:18:36
 Description: 
 Copyright (c) 2023 by windzu, All Rights Reserved. 
 """
-from .data_slice import DataSlice
+from .fusion import Fusion
 from .main import main
-from .ros_dataset import ROSDataset
 
-__all__ = ["main", "DataSlice", "ROSDataset"]
+__all__ = ["main", "Fusion"]

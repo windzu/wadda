@@ -2,21 +2,16 @@
 Author: wind windzu1@gmail.com
 Date: 2023-08-27 18:34:41
 LastEditors: wind windzu1@gmail.com
-LastEditTime: 2023-08-28 00:23:10
+LastEditTime: 2023-08-29 11:23:34
 Description: 
-Copyright (c) 2023 by windzu, All Rights Reserved. 
+Copyright (c) 2023 by windzu, All Rights Reserved 
 """
+import datetime
 import os
 
 import cv2
 import numpy as np
-
-# import open3d as o3d
-import rosbag
-
-# ros
 import rospy
-import yaml
 from pypcd import pypcd
 
 # from scipy.spatial.transform import Rotation as R
@@ -39,6 +34,7 @@ def save_lidar(msg, topic_info, path, filename):
     # save PointCloud2 to bin
     pc = pypcd.PointCloud.from_msg(msg)
     pc.save_pcd(file_path, compression="binary_compressed")
+    # pc.save_pcd(file_path, compression="binary")
 
 
 def save_imu(msg, path, filename):
@@ -50,9 +46,9 @@ def euler_to_rotation_matrix(roll, pitch, yaw):
     Convert Euler angles (roll, pitch, yaw) to a rotation matrix.
     All angles are in degrees.
     """
-    roll = np.radians(roll)
-    pitch = np.radians(pitch)
-    yaw = np.radians(yaw)
+    # roll = np.radians(roll)
+    # pitch = np.radians(pitch)
+    # yaw = np.radians(yaw)
 
     rotation_x = np.array(
         [
@@ -71,7 +67,11 @@ def euler_to_rotation_matrix(roll, pitch, yaw):
     )
 
     rotation_z = np.array(
-        [[np.cos(yaw), -np.sin(yaw), 0], [np.sin(yaw), np.cos(yaw), 0], [0, 0, 1]]
+        [
+            [np.cos(yaw), -np.sin(yaw), 0],
+            [np.sin(yaw), np.cos(yaw), 0],
+            [0, 0, 1],
+        ]
     )
 
     rotation = np.dot(rotation_z, np.dot(rotation_y, rotation_x))
@@ -96,11 +96,21 @@ def timestamp_analyze(datas, main_frame_id):
             print(f"{key} timestamp diff: {timestamp_diff}")
 
 
-def merge_pcd(datas, calib):
+def fusion_pcd(datas, calib, save_path):
     """根据calib合并pcd
     Args:
-        datas (dict): 一组传感器的数据,其中key为frame_id,value为具体数据
+        datas (dict): 一组传感器的数据,其中key为frame_id,value为pcd文件路径
+            {
+                "front_lidar":"xxx.pcd",
+                "left_lidar":"xxx.pcd",
+                "right_lidar":"xxx.pcd",
+            }
         calib (dict): 传感器之间的标定信息,其中key为frame_id,value为变换矩阵
+            {
+                "front_lidar":np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]),
+                "left_lidar":np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]),
+                "right_lidar":np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]),
+            }
     Returns:
         dict: datas来自输入datas,但是删除了原始点云,加入了合并后的pcd
     """
@@ -115,7 +125,7 @@ def merge_pcd(datas, calib):
         Returns:
             numpy.ndarray: 变换后的pcd
         """
-        pc = pypcd.PointCloud.from_msg(pcd)
+        pc = pypcd.PointCloud.from_path(pcd)
         x = pc.pc_data["x"].flatten()
         y = pc.pc_data["y"].flatten()
         z = pc.pc_data["z"].flatten()
@@ -133,18 +143,20 @@ def merge_pcd(datas, calib):
         pc_array_4d[:, 3] = intensity[~nan_index]  # 变换后的点云的intensity要重新赋值
         return pc_array_4d
 
-    merge_pcd = None
+    fusion_pcd = None
     for key, value in calib.items():
-        assert key in datas, f"calib key {key} not in datas"
-        assert isinstance(datas[key], PointCloud2), f"calib key {key} not PointCloud2"
+        # raw_pcd_file = datas[key]
+        # read pcd
+        # raw_pcd = pypcd.PointCloud.from_path(raw_pcd_file)
         pcd = transform_pcd(datas[key], calib[key])
-        del datas[key]
-        if merge_pcd is None:
-            merge_pcd = pcd
+        if fusion_pcd is None:
+            fusion_pcd = pcd
         else:
-            merge_pcd = np.vstack((merge_pcd, pcd))
-    datas["LIDAR"] = merge_pcd
-    return datas
+            fusion_pcd = np.vstack((fusion_pcd, pcd))
+    # datas["LIDAR"] = merge_pcd
+    structured_pc_array = numpy_array_to_structured_array(fusion_pcd)
+    fusion_pc = pypcd.PointCloud.from_array(structured_pc_array)
+    fusion_pc.save_pcd(save_path, compression="binary_compressed")
 
 
 def save_datas(path, scene_name, datas, filename):
@@ -226,3 +238,32 @@ def save_datas(path, scene_name, datas, filename):
             os.makedirs(store_path)
 
         save(path=store_path, data=data, filename=filename)
+
+
+def ros_to_python_timestamp(ros_timestamp):
+    dt = datetime.datetime.fromtimestamp(ros_timestamp.secs)
+    dt += datetime.timedelta(microseconds=ros_timestamp.nsecs // 1000)
+    total_milliseconds = int(dt.timestamp() * 1000)
+    return total_milliseconds
+
+
+def numpy_array_to_structured_array(arr):
+    """
+    将常规的numpy数组转换为结构化数组
+
+    Args:
+        arr (numpy.ndarray): 输入的numpy数组，每一列对应一个字段.
+
+    Returns:
+        numpy.ndarray: 结构化数组
+    """
+    assert arr.shape[1] == 4, "Expected a Nx4 numpy array"
+    dtype = [("x", "f4"), ("y", "f4"), ("z", "f4"), ("intensity", "f4")]
+    structured_arr = np.zeros(arr.shape[0], dtype=dtype)
+
+    structured_arr["x"] = arr[:, 0]
+    structured_arr["y"] = arr[:, 1]
+    structured_arr["z"] = arr[:, 2]
+    structured_arr["intensity"] = arr[:, 3]
+
+    return structured_arr

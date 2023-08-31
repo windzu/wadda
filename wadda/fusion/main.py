@@ -1,18 +1,23 @@
 """
 Author: wind windzu1@gmail.com
-Date: 2023-08-27 18:34:41
+Date: 2023-08-29 12:00:50
 LastEditors: wind windzu1@gmail.com
-LastEditTime: 2023-08-28 00:18:00
+LastEditTime: 2023-08-29 12:01:05
 Description: 
 Copyright (c) 2023 by windzu, All Rights Reserved. 
 """
-import sys
+"""
+Author: wind windzu1@gmail.com
+Date: 2023-08-27 18:34:41
+LastEditors: wind windzu1@gmail.com
+LastEditTime: 2023-08-28 19:14:33
+Description: 
+Copyright (c) 2023 by windzu, All Rights Reserved. 
+"""
+
 from argparse import ArgumentParser
 
-import rospy
-
-# local
-from .data_slice import DataSlice
+from .fusion import Fusion
 
 
 def parse_args():
@@ -26,8 +31,8 @@ def main(args=None):
         args = parse_args()
 
     # gif generator
-    data_slice = DataSlice(path=args.path)
-    data_slice.slice()
+    fusion = Fusion(path=args.path)
+    fusion.fusion()
 
 
 if __name__ == "__main__":

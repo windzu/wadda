@@ -1,5 +1,13 @@
 """
 Author: wind windzu1@gmail.com
+Date: 2023-08-29 12:04:30
+LastEditors: wind windzu1@gmail.com
+LastEditTime: 2023-08-29 12:04:38
+Description: 
+Copyright (c) 2023 by windzu, All Rights Reserved. 
+"""
+"""
+Author: wind windzu1@gmail.com
 Date: 2023-08-27 18:34:41
 LastEditors: wind windzu1@gmail.com
 LastEditTime: 2023-08-28 00:09:36
@@ -12,15 +20,13 @@ import cv2
 import numpy as np
 import yaml
 
-# from scipy.spatial.transform import Rotation as R
 from .utils import euler_to_rotation_matrix
 
 
-# from scipy.spatial.transform import Rotation as R
 class TopicInfo:
     def __init__(self, topic, sensor_type, msg_type):
         self.topic = topic
-        self.sensor_type = sensor_type
+        self.sensor_type = sensor_type  # lidar, camera, radar
         self.msg_type = msg_type
 
     def __repr__(self):
@@ -28,9 +34,10 @@ class TopicInfo:
 
 
 class CalibInfo:
-    def __init__(self, frame_id, tf_config):
+    def __init__(self, frame_id, config):
         self.frame_id = frame_id
-        self.transform_matrix = self.get_transform_matrix(tf_config)
+        self.config = config
+        self.transform_matrix = self.get_transform_matrix(config["tf_config"])
 
     def get_transform_matrix(self, tf_config):
         """获取transform matrix
@@ -54,7 +61,11 @@ class CalibInfo:
         transform[:3, :3] = rotation
         transform[:3, 3] = translation.flatten()
 
-        return transform
+        formatted_transform = np.array(
+            [[format(val, ".6f") for val in row] for row in transform], dtype=float
+        )
+
+        return formatted_transform
 
     def __repr__(self):
         return f"CalibInfo(frame_id={self.frame_id}, transform_matrix={self.transform_matrix})"
@@ -68,6 +79,8 @@ def read_config(path="./config.yaml"):
 
 
 def parse_config(path="./config.yaml"):
+    # 获取进程数
+    worker_num = parse_worker_num(path)
     # 获取所有需要解压的文件
     compressed_files = parse_compressed_file_list(path)
     # 获取所有需要解析的文件
@@ -91,7 +104,11 @@ def parse_config(path="./config.yaml"):
     # 获取是否保存sweep数据
     save_sweep_data = parse_save_sweep_data(path)
 
+    # 获取标定信息
+    cars_calib_info_dict = parse_calib(path)
+
     return {
+        "worker_num": worker_num,
         "compressed_files": compressed_files,
         "files": files,
         "dataset_root": dataset_root,
@@ -103,7 +120,17 @@ def parse_config(path="./config.yaml"):
         "time_diff_threshold": time_diff_threshold,
         "sample_interval": sample_interval,
         "save_sweep_data": save_sweep_data,
+        "cars_calib_info_dict": cars_calib_info_dict,
     }
+
+
+# 读取进程数
+def parse_worker_num(path="./config.yaml"):
+    config = read_config(path)
+
+    # 获取配置值
+    worker_num = config["worker_num"]
+    return worker_num
 
 
 # 读取压缩文件列表
@@ -296,34 +323,44 @@ def parse_save_sweep_data(path):
 
 # 读取标定信息
 def parse_calib(path="./config.yaml"):
+    topics_alias_dict = parse_topics_alias(path)
+
     config = read_config(path)
-    calibs = {}
 
     # 获取配置中的topics
     calib = config["calib"]
     load_way = calib["load_way"]
+    cars_calib_info_dict = {}
     if load_way == "offline":
         print("will load calib from offline file")
         calib_path = calib["calib_path"]
+        # check path
+        if not os.path.exists(calib_path):
+            print("calib path not exist")
+            return None
         # 便利该文件夹下所有yaml文件
         calib_files = []
         for dirpath, dirnames, filenames in os.walk(calib_path):
             for filename in filenames:
                 if filename.endswith(".yaml"):
                     calib_files.append(os.path.join(dirpath, filename))
-        # 读取yaml文件
 
         for calib_file in calib_files:
-            car_calib_info = {}
             car_name = os.path.basename(calib_file).split(".")[0]
             with open(calib_file, "r") as file:
                 calib_data = yaml.safe_load(file)
-                # calib[car_name]=CalibInfo(frame_id=calib_data['frame_id'],tf_config=calib_data['tf_config'])
+                calib_info_dict = {}
+                for key, value in calib_data.items():
+                    frame_id = topics_alias_dict[key]
+                    calib_info = CalibInfo(frame_id=frame_id, config=value)
+                    calib_info_dict[frame_id] = calib_info
+                cars_calib_info_dict[car_name] = calib_info_dict
     else:
         print("will load calib from config")
         calib_path = None
         calib = None
-    return calib
+        cars_calib_info_dict = {}
+    return cars_calib_info_dict
 
 
 # 读取时间戳阈值
@@ -354,86 +391,3 @@ def parse_topic(path="./config.yaml"):
 
     topic_dict = config["topic"]
     return topic_dict
-
-
-def parse_constants(path="./config.yaml"):
-    """从config文件中解析常量
-    Args:
-        path (str, optional): 配置文件路径. Defaults to "./config.yaml".
-    Returns:
-        tuple: 常量元组,其内容下:
-            1. total_frames(int):每一个scene需要采样的总帧数
-            2. scene_interval(float):每一个frame之间的时间间隔
-    """
-    # judge file exist
-    if not os.path.exists(path):
-        return None
-
-    with open(path, "r") as f:
-        config = yaml.safe_load(f)
-    if "constants" not in config:
-        print("constants not in config")
-        return None
-
-    constants_dict = config["constants"]
-    total_frames = int(constants_dict["total_frames"])
-    scene_interval = float(constants_dict["scene_interval"])
-    return total_frames, scene_interval
-
-
-def parse_calib(path="./config.yaml"):
-    """从config文件中解析外參参数
-    Args:
-        path (str, optional): 配置文件路径. Defaults to "./config.yaml".
-    Returns:
-        dict: 每个传感器的外参字典,key为传感器的frame_id,value为对应的外参矩阵
-    """
-    # judge file exist
-    if not os.path.exists(path):
-        return None
-
-    with open(path, "r") as f:
-        config = yaml.safe_load(f)
-    if "calib" not in config:
-        print("calib not in config")
-        return None
-
-    calib_dict = config["calib"]
-
-    calib = {}
-    for frame_id, transform_dict in calib_dict.items():
-        current_transform = np.eye(4)
-
-        # rotation
-        r = R.from_quat(transform_dict["rotation"])
-        rotation = r.as_matrix()
-        current_transform[:3, :3] = rotation
-
-        # translation
-        translation = np.array(transform_dict["translation"]).reshape(3, 1)
-        current_transform[:3, 3] = translation.flatten()
-
-        calib[frame_id] = current_transform
-
-    return calib
-
-
-def parse_primary_frame_id(path="./config.yaml"):
-    """从config文件中解析主frame_id
-    Args:
-        path (str, optional): 配置文件路径. Defaults to "./config.yaml".
-    Returns:
-        str: 主frame_id
-    """
-    # judge file exist
-    if not os.path.exists(path):
-        return None
-
-    with open(path, "r") as f:
-        config = yaml.safe_load(f)
-    if "primary_frame_id" not in config:
-        print("primary_frame_id not in config")
-        return None
-
-    primary_frame_id = config["primary_frame_id"]
-    return primary_frame_id
